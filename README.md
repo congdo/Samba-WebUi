@@ -119,6 +119,7 @@ The setup script will automatically install:
 - Flask-CORS (for CORS support)
 - psutil (for process management)
 - PyJWT (for JWT handling)
+- pexpect (for system command interaction)
 
 ## API Endpoints
 

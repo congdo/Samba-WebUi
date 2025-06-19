@@ -129,7 +129,10 @@ def change_password(username, new_password):
         child.sendline(new_password)
         child.expect(pexpect.EOF, timeout=5)
         output = child.before
-        if "Added user" in output or "Changed password" in output:
+        # Consider success if there's no error message, even with "Forcing Primary Group"
+        if ("Added user" in output or
+            "Changed password" in output or
+            ("Forcing Primary Group" in output and "failed" not in output.lower())):
             log(f"Samba password for '{username}' set successfully.")
             return True
         else:

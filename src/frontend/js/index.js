@@ -30,7 +30,25 @@ async function initApp() {
             return;
         }
 
-        document.getElementById('welcome-message').textContent = `Welcome, ${data.username}`;
+        // Extract first name from username or use username as fallback
+        let greeting = `Welcome, ${data.username}`;
+        const email = data.email;
+        
+        // Extract name from email (format: cong.do@mozox.com)
+        if (email && email.includes('@')) {
+            const [localPart] = email.split('@');
+            if (localPart.includes('.')) {
+                const [firstName] = localPart.split('.');
+                const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+                greeting = `Welcome, ${capitalizedName}`;
+            }
+        }
+        document.getElementById('welcome-message').textContent = greeting;
+        // Show username hint
+        const usernameHint = document.createElement('p');
+        usernameHint.className = 'text-sm text-gray-500 mt-1';
+        usernameHint.textContent = `Your username is: ${data.username}`;
+        document.getElementById('welcome-message').parentNode.insertBefore(usernameHint, document.getElementById('welcome-message').nextSibling);
         if (data.is_admin) {
             document.getElementById('admin-link').classList.remove('hidden');
         }
@@ -55,14 +73,16 @@ document.getElementById('password-form').addEventListener('submit', async (e) =>
         });
 
         const data = await response.json();
-        document.getElementById('message').textContent = data.message;
+        const messageElement = document.querySelector('#password-form #message');
+        messageElement.textContent = data.message;
         
         if (response.ok) {
             e.target.reset();
         }
     } catch (error) {
         console.error('Error:', error);
-        document.getElementById('message').textContent = 'Error updating password';
+        const messageElement = document.querySelector('#password-form #message');
+        messageElement.textContent = 'Error updating password';
     }
 });
 

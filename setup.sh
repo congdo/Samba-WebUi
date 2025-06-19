@@ -70,15 +70,17 @@ source /opt/samba_webui/venv/bin/activate
 
 # Install Python dependencies in virtual environment
 echo "Installing Python dependencies..."
-pip install --no-cache-dir flask flask-cors psutil PyJWT
+pip install --no-cache-dir flask flask-cors psutil PyJWT pexpect
 
 # Copy source files
 echo "Copying application files..."
 if [ -d "${SCRIPT_DIR}/src" ]; then
-    cp -r "${SCRIPT_DIR}/src/"* /opt/samba_webui/
+    # Copy all non-JSON files first
+    find "${SCRIPT_DIR}/src" -type f ! -name "*.json" -exec cp -r {} /opt/samba_webui/ \;
     
-    # Create data directory and copy initial JSON files if they exist
+    # Create data directory for JSON files
     mkdir -p /var/lib/samba_webui
+    
     # Only copy JSON files if they don't exist in destination
     if [ -f "${SCRIPT_DIR}/src/user_roles.json" ] && [ ! -f "/var/lib/samba_webui/user_roles.json" ]; then
         cp "${SCRIPT_DIR}/src/user_roles.json" /var/lib/samba_webui/

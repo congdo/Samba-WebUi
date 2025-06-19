@@ -10,10 +10,10 @@
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+<body class="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 space-y-4">
     <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md text-center">
         <h2 class="text-3xl font-bold mb-6 text-gray-800" id="welcome-message">Welcome</h2>
-        <div class="mb-6 text-gray-700">
+        <div class="text-gray-700">
             <p class="mb-2">To connect to Samba, use:</p>
             <div class="space-y-2">
                 <div>
@@ -27,6 +27,10 @@
             </div>
             <p class="text-sm mt-2 text-gray-600">Use these addresses in your file manager to access Samba shares</p>
         </div>
+    </div>
+
+    <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md text-center">
+        <h3 class="text-2xl font-semibold mb-6 text-gray-800">Password Management</h3>
         <form id="password-form" class="space-y-4">
             <p class="text-gray-600">Set or Change Your Samba Password</p>
             <input name="password" type="password" placeholder="New Password" required
@@ -35,6 +39,7 @@
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition-colors duration-200">
                 Submit
             </button>
+            <p id="message" class="text-sm mt-2 text-gray-700"></p>
         </form>
         <p class="mt-4 text-sm text-gray-700" id="message"></p>
         <div id="admin-link" class="mt-4 hidden">

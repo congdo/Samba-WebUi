@@ -20,6 +20,7 @@ def register_user_routes(app):
 
         return jsonify({
             'username': username,
+            'email': email,
             'is_admin': is_admin(email)
         })
 
