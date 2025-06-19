@@ -79,10 +79,11 @@ if [ -d "${SCRIPT_DIR}/src" ]; then
     
     # Create data directory and copy initial JSON files if they exist
     mkdir -p /var/lib/samba_webui
-    if [ -f "${SCRIPT_DIR}/src/user_roles.json" ]; then
+    # Only copy JSON files if they don't exist in destination
+    if [ -f "${SCRIPT_DIR}/src/user_roles.json" ] && [ ! -f "/var/lib/samba_webui/user_roles.json" ]; then
         cp "${SCRIPT_DIR}/src/user_roles.json" /var/lib/samba_webui/
     fi
-    if [ -f "${SCRIPT_DIR}/src/user_groups.json" ]; then
+    if [ -f "${SCRIPT_DIR}/src/user_groups.json" ] && [ ! -f "/var/lib/samba_webui/user_groups.json" ]; then
         cp "${SCRIPT_DIR}/src/user_groups.json" /var/lib/samba_webui/
     fi
 else

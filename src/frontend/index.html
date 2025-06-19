@@ -13,6 +13,20 @@
 <body class="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
     <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md text-center">
         <h2 class="text-3xl font-bold mb-6 text-gray-800" id="welcome-message">Welcome</h2>
+        <div class="mb-6 text-gray-700">
+            <p class="mb-2">To connect to Samba, use:</p>
+            <div class="space-y-2">
+                <div>
+                    <p class="text-sm text-gray-600">Windows:</p>
+                    <p class="font-mono bg-gray-100 p-2 rounded" id="server-ip-windows">Loading...</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Linux/Mac:</p>
+                    <p class="font-mono bg-gray-100 p-2 rounded" id="server-ip-unix">Loading...</p>
+                </div>
+            </div>
+            <p class="text-sm mt-2 text-gray-600">Use these addresses in your file manager to access Samba shares</p>
+        </div>
         <form id="password-form" class="space-y-4">
             <p class="text-gray-600">Set or Change Your Samba Password</p>
             <input name="password" type="password" placeholder="New Password" required

@@ -1,3 +1,19 @@
+// Fetch and display server IP
+async function loadServerIP() {
+    try {
+        const response = await fetch('/api/server-ip');
+        const data = await response.json();
+        if (data.ip) {
+            document.getElementById('server-ip-windows').textContent = `\\\\${data.ip}`;
+            document.getElementById('server-ip-unix').textContent = `smb://${data.ip}`;
+        }
+    } catch (error) {
+        console.error('Error fetching server IP:', error);
+        document.getElementById('server-ip-windows').textContent = 'Could not load server IP';
+        document.getElementById('server-ip-unix').textContent = 'Could not load server IP';
+    }
+}
+
 // Check authentication and load user data
 async function initApp() {
     try {
@@ -52,3 +68,4 @@ document.getElementById('password-form').addEventListener('submit', async (e) =>
 
 // Initialize the application
 initApp();
+loadServerIP();
