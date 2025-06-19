@@ -2,6 +2,8 @@
 
 > **⚠️ Security Notice**: This application has no built-in security measures as it relies entirely on Cloudflare for security. We trust Cloudflare to generate and validate JWT tokens, and to only allow users with valid JWTs to access the application. All security is handled at the Cloudflare level.
 
+> **📝 Development Note**: This project was primarily developed by AI with human guidance and oversight. The codebase, documentation, and architecture were created through collaborative interaction between AI and human developers.
+
 A Flask web application for managing Samba users and shares.
 
 ## Project Structure
