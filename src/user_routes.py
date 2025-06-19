@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from utils import get_email_from_jwt, get_username_from_email
-from database import load_roles, is_admin
+from database import load_roles, is_admin, load_groups
 from user_management import user_exists_unix, create_unix_user, change_password
 
 def register_user_routes(app):
@@ -44,3 +44,18 @@ def register_user_routes(app):
         if change_password(username, data['password']):
             return jsonify({'message': 'Password changed successfully'})
         return jsonify({'error': 'Failed to change password'}), 500
+
+    @app.route('/api/user/groups')
+    def get_user_groups():
+        email = get_email_from_jwt()
+        if not email:
+            return jsonify({'error': 'Unauthorized'}), 401
+
+        username = get_username_from_email(email)
+        if not username:
+            return jsonify({'error': 'Invalid token'}), 401
+
+        groups_data = load_groups()
+        user_groups = groups_data.get(username, [])
+        
+        return jsonify({'groups': sorted(user_groups)})

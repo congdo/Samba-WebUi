@@ -75,19 +75,9 @@ pip install --no-cache-dir flask flask-cors psutil PyJWT pexpect
 # Copy source files
 echo "Copying application files..."
 if [ -d "${SCRIPT_DIR}/src" ]; then
-    # Copy all non-JSON files first
-    find "${SCRIPT_DIR}/src" -type f ! -name "*.json" -exec cp -r {} /opt/samba_webui/ \;
-    
-    # Create data directory for JSON files
-    mkdir -p /var/lib/samba_webui
-    
-    # Only copy JSON files if they don't exist in destination
-    if [ -f "${SCRIPT_DIR}/src/user_roles.json" ] && [ ! -f "/var/lib/samba_webui/user_roles.json" ]; then
-        cp "${SCRIPT_DIR}/src/user_roles.json" /var/lib/samba_webui/
-    fi
-    if [ -f "${SCRIPT_DIR}/src/user_groups.json" ] && [ ! -f "/var/lib/samba_webui/user_groups.json" ]; then
-        cp "${SCRIPT_DIR}/src/user_groups.json" /var/lib/samba_webui/
-    fi
+    # Copy src directory structure preserving paths
+    mkdir -p /opt/samba_webui
+    cp -rf ${SCRIPT_DIR}/src/* /opt/samba_webui/
 else
     echo "Error: Source directory not found at ${SCRIPT_DIR}/src"
     exit 1
@@ -149,7 +139,7 @@ python3 -c "import flask, flask_cors, psutil" 2>> "$SCRIPT_LOG" || {
 
 # Start the application
 log "Starting application"
-exec python app.py "$@" 2>&1 | tee -a "$SCRIPT_LOG"
+exec python src/app.py "$@" 2>&1 | tee -a "$SCRIPT_LOG"
 EOF
 chmod 755 /opt/samba_webui/run.sh
 

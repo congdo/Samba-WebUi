@@ -17,22 +17,26 @@ async function loadServerIP() {
 // Check authentication and load user data
 async function initApp() {
     try {
-        const response = await fetch('/api/user/profile');
-        const data = await response.json();
+        const [profileResponse, groupsResponse] = await Promise.all([
+            fetch('/api/user/profile'),
+            fetch('/api/user/groups')
+        ]);
         
-        if (response.status === 401) {
+        const profileData = await profileResponse.json();
+        
+        if (profileResponse.status === 401) {
             window.location.href = '/unauthorized';
             return;
         }
 
-        if (response.status === 403) {
+        if (profileResponse.status === 403) {
             document.getElementById('message').textContent = 'Account is disabled';
             return;
         }
 
         // Extract first name from username or use username as fallback
-        let greeting = `Welcome, ${data.username}`;
-        const email = data.email;
+        let greeting = `Welcome, ${profileData.username}`;
+        const email = profileData.email;
         
         // Extract name from email (format: cong.do@mozox.com)
         if (email && email.includes('@')) {
@@ -44,12 +48,23 @@ async function initApp() {
             }
         }
         document.getElementById('welcome-message').textContent = greeting;
+        
         // Show username hint
         const usernameHint = document.createElement('p');
         usernameHint.className = 'text-sm text-gray-500 mt-1';
-        usernameHint.textContent = `Your username is: ${data.username}`;
+        usernameHint.textContent = `Your username is: ${profileData.username}`;
         document.getElementById('welcome-message').parentNode.insertBefore(usernameHint, document.getElementById('welcome-message').nextSibling);
-        if (data.is_admin) {
+
+        // Show user groups
+        const groupsData = await groupsResponse.json();
+        if (groupsData.groups && groupsData.groups.length > 0) {
+            const groupsInfo = document.createElement('p');
+            groupsInfo.className = 'text-sm text-gray-600 mt-2';
+            groupsInfo.textContent = `Your groups: ${groupsData.groups.join(', ')}`;
+            document.getElementById('welcome-message').parentNode.insertBefore(groupsInfo, usernameHint.nextSibling);
+        }
+
+        if (profileData.is_admin) {
             document.getElementById('admin-link').classList.remove('hidden');
         }
     } catch (error) {

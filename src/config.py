@@ -5,8 +5,8 @@ import shutil
 USE_ADDUSER = shutil.which("adduser") and not shutil.which("useradd")
 
 # File paths
-ROLES_FILE = "user_roles.json"
-GROUPS_FILE = "user_groups.json"  # Now also stores master list of groups
+ROLES_FILE = "/var/lib/samba_webui/user_roles.json"
+GROUPS_FILE = "/var/lib/samba_webui/user_groups.json"  # Now also stores master list of groups
 SHARE_BASE_PATH = "/srv/samba"
 SMB_CONF_PATH = "/etc/samba/smb.conf"
 
