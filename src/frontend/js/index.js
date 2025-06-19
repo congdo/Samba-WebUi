@@ -49,20 +49,46 @@ async function initApp() {
         }
         document.getElementById('welcome-message').textContent = greeting;
         
-        // Show username hint
-        const usernameHint = document.createElement('p');
-        usernameHint.className = 'text-sm text-gray-500 mt-1';
-        usernameHint.textContent = `Your username is: ${profileData.username}`;
-        document.getElementById('welcome-message').parentNode.insertBefore(usernameHint, document.getElementById('welcome-message').nextSibling);
-
-        // Show user groups
+        // Create user info section
+        const userInfoSection = document.createElement('div');
+        userInfoSection.className = 'mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200 shadow-sm';
+        
+        // Create user info container
+        const userInfo = document.createElement('div');
+        userInfo.className = 'space-y-3';
+        
+        // Add username with icon
+        const usernameInfo = document.createElement('p');
+        usernameInfo.className = 'flex items-center text-blue-900';
+        usernameInfo.innerHTML = `
+            <span class="text-xl mr-3">👤</span>
+            <span class="flex-1">
+                <span class="text-blue-600 font-medium">Username:</span>
+                <span class="ml-2 font-bold">${profileData.username}</span>
+            </span>
+        `;
+        userInfo.appendChild(usernameInfo);
+        
+        // Add groups with icon
         const groupsData = await groupsResponse.json();
         if (groupsData.groups && groupsData.groups.length > 0) {
             const groupsInfo = document.createElement('p');
-            groupsInfo.className = 'text-sm text-gray-600 mt-2';
-            groupsInfo.textContent = `Your groups: ${groupsData.groups.join(', ')}`;
-            document.getElementById('welcome-message').parentNode.insertBefore(groupsInfo, usernameHint.nextSibling);
+            groupsInfo.className = 'flex items-center text-blue-900';
+            groupsInfo.innerHTML = `
+                <span class="text-xl mr-3">👥</span>
+                <span class="flex-1">
+                    <span class="text-blue-600 font-medium">Groups:</span>
+                    <span class="ml-2 font-bold">${groupsData.groups.join(', ')}</span>
+                </span>
+            `;
+            userInfo.appendChild(groupsInfo);
         }
+        
+        userInfoSection.appendChild(userInfo);
+        document.getElementById('welcome-message').parentNode.insertBefore(
+            userInfoSection,
+            document.getElementById('welcome-message').nextSibling
+        );
 
         if (profileData.is_admin) {
             document.getElementById('admin-link').classList.remove('hidden');

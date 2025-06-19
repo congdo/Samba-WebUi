@@ -76,8 +76,8 @@ pip install --no-cache-dir flask flask-cors psutil PyJWT pexpect
 echo "Copying application files..."
 if [ -d "${SCRIPT_DIR}/src" ]; then
     # Copy src directory structure preserving paths
-    mkdir -p /opt/samba_webui
-    cp -rf ${SCRIPT_DIR}/src/* /opt/samba_webui/
+    mkdir -p /opt/samba_webui/src
+    cp -rf ${SCRIPT_DIR}/src/ /opt/samba_webui/
 else
     echo "Error: Source directory not found at ${SCRIPT_DIR}/src"
     exit 1
@@ -164,6 +164,10 @@ if command -v rc-update >/dev/null 2>&1; then
 else
     echo "Warning: rc-update not found. Please manually configure service to start on boot."
 fi
+
+# Start/restart the service
+echo "Starting Samba WebUI service..."
+/etc/init.d/samba_webui restart
 
 echo "Installation complete!"
 echo

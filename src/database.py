@@ -1,32 +1,21 @@
 import os
 import json
 from utils import log
-
-def _get_json_path():
-    """Return dictionary of JSON database file paths."""
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    return {
-        'roles': os.path.join(script_dir, 'user_roles.json'),
-        'groups': os.path.join(script_dir, 'user_groups.json')
-    }
+from config import ROLES_FILE, GROUPS_FILE
 
 def load_roles():
     """Load user roles from json file."""
-    json_paths = _get_json_path()
-    roles_file = json_paths['roles']
-    if os.path.exists(roles_file):
-        with open(roles_file) as f:
-            log(f"Loading roles from {roles_file}")
+    if os.path.exists(ROLES_FILE):
+        with open(ROLES_FILE) as f:
+            log(f"Loading roles from {ROLES_FILE}")
             return json.load(f)
-    log(f"No existing roles file at {roles_file}, creating empty roles")
+    log(f"No existing roles file at {ROLES_FILE}, creating empty roles")
     return {}
 
 def save_roles(roles):
     """Save user roles to json file."""
-    json_paths = _get_json_path()
-    roles_file = json_paths['roles']
-    with open(roles_file, "w") as f:
-        log(f"Saving roles to {roles_file}")
+    with open(ROLES_FILE, "w") as f:
+        log(f"Saving roles to {ROLES_FILE}")
         json.dump(roles, f, indent=2)
 
 def load_groups():
@@ -39,25 +28,21 @@ def load_groups():
         ...
     }
     """
-    json_paths = _get_json_path()
-    groups_file = json_paths['groups']
-    if os.path.exists(groups_file):
-        with open(groups_file) as f:
-            log(f"Loading groups from {groups_file}")
+    if os.path.exists(GROUPS_FILE):
+        with open(GROUPS_FILE) as f:
+            log(f"Loading groups from {GROUPS_FILE}")
             data = json.load(f)
             # Ensure _groups key exists
             if "_groups" not in data:
                 data["_groups"] = []
             return data
-    log(f"No existing groups file at {groups_file}, creating empty groups")
+    log(f"No existing groups file at {GROUPS_FILE}, creating empty groups")
     return {"_groups": []}  # Initialize with an empty master group list
 
 def save_groups(groups_data):
     """Save groups data to json file."""
-    json_paths = _get_json_path()
-    groups_file = json_paths['groups']
-    with open(groups_file, "w") as f:
-        log(f"Saving groups to {groups_file}")
+    with open(GROUPS_FILE, "w") as f:
+        log(f"Saving groups to {GROUPS_FILE}")
         json.dump(groups_data, f, indent=2)
 
 def get_all_managed_groups():

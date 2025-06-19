@@ -5,14 +5,13 @@ import psutil
 from flask import Flask
 from flask_cors import CORS
 
-from config import SHARE_BASE_PATH
+from config import SHARE_BASE_PATH, ROLES_FILE, GROUPS_FILE
 from utils import log, error
 from user_management import group_exists_unix
 from samba_config import generate_smb_conf, reload_samba
 from frontend_routes import register_frontend_routes
 from user_routes import register_user_routes
 from admin_routes import register_admin_routes
-from database import _get_json_path
 
 def is_running_from_rc():
     """Check if the process is being run from an RC script."""
@@ -88,10 +87,9 @@ if __name__ == "__main__":
     
     if debug:
         # Show database file locations
-        json_paths = _get_json_path()
         log("\nJSON Database Locations:")
-        log(f"  Roles DB: {json_paths['roles']}")
-        log(f"  Groups DB: {json_paths['groups']}")
+        log(f"  Roles DB: {ROLES_FILE}")
+        log(f"  Groups DB: {GROUPS_FILE}")
         
         log("\nRunning in development mode with debug enabled")
         log(f"Access the application at http://{host}:{port}")
