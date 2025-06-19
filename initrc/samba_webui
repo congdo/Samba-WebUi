@@ -1,0 +1,146 @@
+#!/sbin/openrc-run
+
+# Define basic service information
+name="samba_webui"
+description="Samba Web User Interface"
+
+# Path to our wrapper script that activates venv
+command="/opt/samba_webui/run.sh"
+
+# PID file to track the running process
+pidfile="/run/${RC_SVCNAME}/${RC_SVCNAME}.pid"
+
+# Log file for stdout and stderr
+logfile="/var/log/samba_webui/${name}.log"
+
+# User and group to run the service as
+user="root"
+group="root"
+
+# Dependencies
+depend() {
+    need localmount net
+    after samba
+}
+
+# Pre-start checks
+start_pre() {
+    checkpath -d -m 755 "/run/${RC_SVCNAME}"
+    checkpath -d -m 0755 "$(dirname "${logfile}")"
+    
+    if [ ! -d "/opt/samba_webui" ]; then
+        eerror "Application directory /opt/samba_webui does not exist"
+        return 1
+    fi
+
+    if [ ! -f "/opt/samba_webui/venv/bin/python" ]; then
+        eerror "Python virtual environment not properly installed"
+        return 1
+    fi
+
+    if [ ! -x "${command}" ]; then
+        eerror "Wrapper script ${command} not found or not executable"
+        return 1
+    fi
+
+    if [ ! -f "/opt/samba_webui/app.py" ]; then
+        eerror "Application file app.py not found"
+        return 1
+    fi
+
+    # Kill any existing processes
+    _cleanup_processes
+}
+
+# Helper function to find and kill all related processes
+_cleanup_processes() {
+    # Kill python process
+    pkill -f "python.*app\.py" 2>/dev/null
+
+    # Kill tee process for log
+    pkill -f "tee.*${name}.*log" 2>/dev/null
+
+    # Give processes time to die
+    sleep 1
+
+    # Force kill if still running
+    pkill -9 -f "python.*app\.py" 2>/dev/null
+    pkill -9 -f "tee.*${name}.*log" 2>/dev/null
+
+    # Remove PID file if it exists
+    rm -f "${pidfile}"
+}
+
+# Start function
+start() {
+    ebegin "Starting ${name}"
+    
+    # Start the daemon
+    start-stop-daemon --start \
+        --pidfile "${pidfile}" \
+        --make-pidfile \
+        --background \
+        --user "${user}" \
+        --group "${group}" \
+        --stdout "${logfile}" \
+        --stderr "${logfile}" \
+        --exec "${command}"
+    
+    # Give the application time to start listening
+    local timeout=10
+    local port=8080
+    
+    einfo "Waiting for service to start (max ${timeout} seconds)..."
+    
+    # Wait for the port to be available
+    local i=0
+    while [ $i -lt $timeout ]; do
+        if netstat -tln | grep -q ":${port}"; then
+            einfo "${name} is listening on port ${port}"
+            eend 0
+            return 0
+        fi
+        sleep 1
+        i=$((i + 1))
+    done
+    
+    # If we get here, startup failed
+    eerror "${name} failed to start (not listening on port ${port})"
+    _cleanup_processes
+    eend 1
+}
+
+# Stop function
+stop() {
+    ebegin "Stopping ${name}"
+    
+    # Try graceful stop first
+    start-stop-daemon --stop \
+        --pidfile "${pidfile}" \
+        --retry TERM/5
+    
+    # Clean up all related processes
+    _cleanup_processes
+    
+    # Clean up run directory
+    [ -d "/run/${RC_SVCNAME}" ] && rm -rf "/run/${RC_SVCNAME}"
+    
+    eend 0
+}
+
+# Status check
+status() {
+    if pgrep -f "python.*app\.py" >/dev/null; then
+        if netstat -tln | grep -q ":8080"; then
+            einfo "${name} is running and listening on port 8080"
+            return 0
+        else
+            einfo "${name} process exists but not listening yet"
+            return 0
+        fi
+    else
+        einfo "${name} is not running"
+        rm -f "${pidfile}"
+        return 3
+    fi
+}
